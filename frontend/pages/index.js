@@ -1,10 +1,34 @@
 import Head from "next/head";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import NewAppDialog from "../components/NewApplicationView";
 import { setExpanded } from "../reducers/globalReducer";
+import { setAppData, setSelectedApp } from "../reducers/applicationReducer";
 
 function ListApplicationRows(props) {
-  if (props.apps.length > 0) {
+  const dispatch = useDispatch();
+  var selectedColor = " bg-slate-50 odd:bg-slate-100 ";
+  var selectedIdx = useSelector((state) => state.application.selectedApp);
+
+  if (props.apps?.length > 0) {
+    return props.apps.map((ele, idx) => {
+      if (idx == selectedIdx) {
+        selectedColor = " bg-yellow-300";
+      } else {
+        selectedColor = " bg-slate-50 odd:bg-slate-100 ";
+      }
+      return (
+        <div
+          onClick={() => {
+            dispatch(setSelectedApp(idx));
+          }}
+          key={idx}
+          className={`w-full px-2 text-xl h-8 select-none hover:bg-yellow-400 active:bg-yellow-700 border-y  border-black flex font-extrabold flex-row items-center justify-centertext-lg ${selectedColor}`}
+        >
+          {ele.buisnessName}
+        </div>
+      );
+    });
   } else {
     return (
       <div className="w-full flex flex-1 font-bold flex-row items-center justify-center bg-slate-50 text-lg">
@@ -17,6 +41,12 @@ function ListApplicationRows(props) {
 export default function Home() {
   const appList = useSelector((state) => state.application.list);
   const dispatch = useDispatch();
+  useEffect(async () => {
+    let response = await fetch("http://localhost:3005/Application");
+    let AppList = await response.json();
+    console.log(AppList);
+    dispatch(setAppData(AppList));
+  }, []);
 
   return (
     <div className="w-screen flex flex-col items-center justify-center min-h-screen h-screen py-2 px-10">
@@ -40,8 +70,14 @@ export default function Home() {
           <div className="w-full font-extrabold h-12 flex flex-row items-center justify-center border-black bg-slate-300 border-b text-2xl">
             Application List
           </div>
-          <div className="w-full flex flex-1 flex-row items-start justify-start bg-white">
+          <div className="w-full flex flex-1 flex-col items-center justify-start bg-white">
             <ListApplicationRows apps={appList}></ListApplicationRows>
+            <div
+              onClick={() => {
+                dispatch(setSelectedApp(-1));
+              }}
+              className="w-full flex-1 bg-slate-50"
+            ></div>
           </div>
           <div className="w-full h-12 flex flex-row items-center justify-center border-black bg-slate-100 border-t text-2xl">
             <div

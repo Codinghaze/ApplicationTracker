@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   loading: false,
-  expanded: true,
+  expanded: false,
 };
 
 export const globalSlice = createSlice({

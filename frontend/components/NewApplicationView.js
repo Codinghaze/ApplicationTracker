@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setExpanded } from "../reducers/globalReducer";
+import { setAppData } from "../reducers/applicationReducer";
 
 export default function NewDocumentDialog(props) {
   const [data, setData] = useState({
-    name: "",
+    buisnessName: "",
     industry: "",
     email: "",
-    sales: 0,
-    payroll: 0,
+    annualSales: 0,
+    annualPayroll: 0,
     empCount: 0,
-    zip: "",
+    zipCode: "",
   });
   const dispatch = useDispatch();
   const expanded = useSelector((state) => state.global.expanded);
@@ -21,11 +22,40 @@ export default function NewDocumentDialog(props) {
         <div
           className="absolute w-full h-screen left-0 top-0 bg-white opacity-40"
           onClick={() => {
+            setData({
+              buisnessName: "",
+              industry: "",
+              email: "",
+              annualSales: 0,
+              annualPayroll: 0,
+              empCount: 0,
+              zipCode: "",
+            });
             dispatch(setExpanded(false));
           }}
         />
         <div className="w-full z-10 flex flex-col px-20 items-center justify-center rounded-xl">
-          <div className="w-full z-10 flex flex-col shadow-md items-center justify-center rounded-xl">
+          <form
+            onSubmit={async (evt) => {
+              evt.preventDefault();
+              let goodRes = await fetch("http://localhost:3005/Application", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: JSON.stringify(data),
+              }).catch((err) => {
+                console.log(err);
+              });
+              let response = await fetch("http://localhost:3005/Application");
+              let AppList = await response.json();
+              console.log(AppList);
+              dispatch(setAppData(AppList));
+              dispatch(setExpanded(false));
+            }}
+            className="w-full z-10 flex flex-col shadow-md items-center justify-center rounded-xl"
+          >
             <div className="w-full bg-slate-300 text-black h-8 text-2x text-2xl flex flex-row items-center justify-center px-2 py-2 rounded-t-xl">
               New Application
             </div>
@@ -38,10 +68,10 @@ export default function NewDocumentDialog(props) {
                   </div>
                   <input
                     onChange={(evt) =>
-                      setData({ ...data, name: evt.target.value })
+                      setData({ ...data, buisnessName: evt.target.value })
                     }
-                    value={data.name}
-                    className="w-1/2 items-center justify-center flex flex-row "
+                    value={data.buisnessName}
+                    className="w-1/2 px-2 items-center justify-center flex flex-row "
                   ></input>
                 </div>
                 <div className="w-96 h-8 text-lg text-black flex flex-row items-center justify-center">
@@ -53,7 +83,7 @@ export default function NewDocumentDialog(props) {
                       setData({ ...data, industry: evt.target.value })
                     }
                     value={data.industry}
-                    className="w-1/2 items-center justify-center flex flex-row "
+                    className="w-1/2 px-2 items-center justify-center flex flex-row "
                   ></input>
                 </div>
                 <div className="w-96 h-8 text-lg text-black flex flex-row items-center justify-center">
@@ -65,7 +95,7 @@ export default function NewDocumentDialog(props) {
                       setData({ ...data, email: evt.target.value })
                     }
                     value={data.email}
-                    className="w-1/2 items-center justify-center flex flex-row "
+                    className="w-1/2 px-2 items-center justify-center flex flex-row "
                   ></input>
                 </div>
                 <div className="w-96 h-8 text-lg text-black flex flex-row items-center justify-center">
@@ -74,10 +104,10 @@ export default function NewDocumentDialog(props) {
                   </div>
                   <select
                     onChange={(evt) =>
-                      setData({ ...data, sales: evt.target.value })
+                      setData({ ...data, annualSales: evt.target.value })
                     }
-                    value={data.sales}
-                    className="w-1/2 items-center justify-center flex flex-row "
+                    value={data.annualSales}
+                    className="w-1/2 px-2 items-center justify-center flex flex-row "
                   >
                     <option value="0">0</option>
                     <option value="50">50K</option>
@@ -93,10 +123,10 @@ export default function NewDocumentDialog(props) {
                   </div>
                   <select
                     onChange={(evt) =>
-                      setData({ ...data, payroll: evt.target.value })
+                      setData({ ...data, annualPayroll: evt.target.value })
                     }
-                    value={data.payroll}
-                    className="w-1/2 items-center justify-center flex flex-row "
+                    value={data.annualPayroll}
+                    className="w-1/2 px-2 items-center justify-center flex flex-row "
                   >
                     <option value="0">0</option>
                     <option value="50">50K</option>
@@ -106,30 +136,28 @@ export default function NewDocumentDialog(props) {
                     <option value="200">200K</option>
                   </select>
                 </div>
+                <div className="w-96 h-8 text-lg text-black flex flex-row items-center justify-center">
+                  <div className="w-1/2 items-center justify-center flex flex-row ">
+                    Zip Code
+                  </div>
+                  <input
+                    onChange={(evt) =>
+                      setData({ ...data, zipCode: evt.target.value })
+                    }
+                    value={data.zipCode}
+                    className="w-1/2 px-2 items-center justify-center flex flex-row "
+                  ></input>
+                </div>
               </div>
             </div>
             <div className="w-full bg-slate-100 h-12 text-2xl flex flex-row items-center justify-center py-2 text-black rounded-b-xl">
-              <div
-                //TODO Add Function to Save
-                onClick={() => {
-                  dispatch(setExpanded(false));
-                  alert(JSON.stringify(data));
-                  setData({
-                    name: "",
-                    email: "",
-                    industry: "",
-                    payroll: 0,
-                    empCount: 0,
-                    sales: 0,
-                    zip: "",
-                  });
-                }}
-                className="w-96 h-8 bg-slate-400 hover:text-yellow-500 select-none active:text-yellow-700 flex flex-row items-center justify-center rounded-sm"
-              >
-                Create
-              </div>
+              <input
+                className="w-96 h-8  px-2 bg-slate-400 hover:text-yellow-500 select-none active:text-yellow-700 flex flex-row items-center justify-center rounded-sm"
+                type="submit"
+                value="Submit"
+              />
             </div>
-          </div>
+          </form>
         </div>
       </div>
     );
