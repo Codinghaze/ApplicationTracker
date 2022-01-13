@@ -7,12 +7,15 @@ To Run this Application
 
 ## Backend Startup 
 cd into backend
+<br />
 dotnet run
 
 ## Fronetend Startup
 cd into reactapp
+<br />
 npm run start
 
 ## Redis Startup
 cd into Structure
+<br />
 docker-compose up
